@@ -13,62 +13,50 @@
         <h1>Welcome to jQueryAir</h1>
         <p>You can book your ticket below</p>
 
-          <ul class="tickets-typeadead" id='bookings' data-bind='foreach: destinationsSuggested'>
-            <li>
-                <a href="#"><span data-bind="text: city, click: $parent.setDestination" ></span></a>
-            </li>
-          </ul>
-
         <hr/>
         <form role="form" action="#">
-            <div class="form-group" data-bind="css: destination.class">
+            <div class="form-group">
                 <label for="destination">Destination</label>
-                <label class="control-label" data-bind="text: destination.text, visible: destination.error"></label>
-                <input id="destination" class="form-control" type="text" autocomplete="off" data-bind="value: destination.value, valueUpdate: 'afterkeydown'">
+                <input id="destination" class="form-control" type="text" autocomplete="off">
             </div>
 
             <div class="form-group">
                 <label for="departureDate">Departure</label>
-                <label class="control-label" data-bind="text: departureDate.text, visible: departureDate.error"></label>
-                <input id="departureDate" class="form-control" type="text" placeholder="dd-mm-yyyy" data-date-format="dd-mm-yyyy" data-bind="value: departureDate.value, valueUpdate: 'afterkeydown'">
+                <input id="departureDate" class="form-control" type="text" placeholder="dd-mm-yyyy" data-date-format="dd-mm-yyyy">
             </div>
 
             <hr/>
 
-            <div class="form-group" data-bind="css: passengerName.class">
+            <div class="form-group">
                 <label for="passengerName">Passenger name</label>
-                <label class="control-label" data-bind="text: passengerName.text, visible: passengerName.error"></label>
-                <input type="text" class="form-control" id="passengerName" data-bind="value: passengerName.value, flash: passengerName.value, valueUpdate: 'afterkeydown'">
+                <input type="text" class="form-control" id="passengerName">
             </div>
 
-            <div class="form-group" data-bind="css: passengerSurname.class">
+            <div class="form-group">
                 <label for="passengerSurname">Passenger surname</label>
-                <label class="control-label" data-bind="text: passengerSurname.text, visible: passengerSurname.error"></label>
-                <input type="text" class="form-control" id="passengerSurname" data-bind="value: passengerSurname.value, valueUpdate: 'afterkeydown'">
+                <input type="text" class="form-control" id="passengerSurname">
             </div>
 
-            <div class="form-group" data-bind="css: emailAddress.class">
+            <div class="form-group">
                 <label for="emailAddress">Email address</label>
-                <label class="control-label" data-bind="text: emailAddress.text, visible: emailAddress.error"></label>
-                <input type="email" class="form-control" id="emailAddress" placeholder="Enter email" data-bind="value: emailAddress.value, valueUpdate: 'afterkeydown'">
+                <input type="email" class="form-control" id="emailAddress" placeholder="Enter email">
             </div>
 
             <hr/>
 
             <div class="form-group">
                 <label for="seat">Preferred seat</label>
-                <input type="text" id="seat" data-bind="value: seatId, seatChoose: seatId">
+                <input type="text" class="form-control" id="seat">
             </div>
 
             <div class="form-group">
                 <label for="additionalLuggage">Additional luggage</label>
-                <label class="control-label"></label>
-                <input type="number" class="form-control" id="additionalLuggage" min="0" max="5" value="0" data-bind="value: luggage">
+                <input type="number" class="form-control" id="additionalLuggage" min="0" max="5" value="0">
             </div>
 
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" id="priority" data-bind="value: priority"> Priority boarding
+                    <input type="checkbox" id="priority"> Priority boarding
                 </label>
             </div>
 
@@ -80,10 +68,10 @@
 
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" id="terms" data-bind="value: accept"> I accept terms and conditions
+                    <input type="checkbox" id="terms"> I accept terms and conditions
                 </label>
             </div>
-            <button type="submit" class="btn btn-primary" data-bind="click: submit">Book ticket</button>
+            <button type="submit" class="btn btn-primary">Book ticket</button>
         </form>
     </div>
 
@@ -117,21 +105,6 @@
 <script src="vendor/datepicker/js/bootstrap-datepicker.js"></script>
 <script src="vendor/typeahead/typeahead.js"></script>
 <script src="vendor/seatChooser/seatChooser.js"></script>
-<!-- <script src="js/main.js"></script> -->
-
-<script type='text/javascript' src='js/knockout-3.1.0.js'></script>
-<script src="js/main_knockout.js"></script>
-<script src="js/nat.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>
-
-<!---
-data-bind="value: name"
-
-data-bind="seatChoose: seatId"
-
-data-bind="value : seatId"
-
-<span data-bin="visible: invalidName">Invalid name</span>
-
---->

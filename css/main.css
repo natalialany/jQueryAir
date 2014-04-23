@@ -1,7 +1,19 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
 .container {
     padding-bottom: 20px;
 }
 
 .control-label {
     padding-left: 10px;
+}
+
+/* Nat */
+.tickets-typeadead {
+	list-style: none;
+	border: 1px solid black;
+	padding: 10px;
 }

@@ -1,0 +1,71 @@
+
+
+ko.bindingHandlers.seatChoose = {
+	init: function(element) { //przetwarzany element, do ktorego jestesmy podpieci
+		//odpala sie raz po podpieciu tego bindingu
+		$(element).seatChooser(); //inicjalizacja pluginu, zapisuje referencje do siebie, zebysmy mogli sie do niego dostac
+	},
+	update: function(element, valueAccessor) {
+		var value = valueAccessor();
+		var valueUnwrapped = ko.unwrap(value);
+
+		$(element).data('plugin_seatChooser').setSeat(valueUnwrapped); //rozmawianie z pluginem, mowienie mu, ze zmienila sie wartosc
+	}
+};
+
+
+///////////
+
+data w jQuery pozwala zapisac dane
+np $('body').data('bla')
+
+///
+
+$0 obecnie inspektowany element
+
+$($0).data()
+
+
+
+//////////////////
+
+
+var AppViewMode - function() {
+	
+	var self = this;
+
+	this.name = ....
+	this.seatId = .....
+
+	this.validateName = ko.computed( {
+		write: function() {
+			console.log('warite');
+			//tu mozna robic validacje
+
+			if (value.length > 2) {
+				self.name = value;
+				self.invalidName(false);
+			} else {
+				self.invalidName(true);
+			}
+
+		},
+		read: function() {
+			console.log('read');
+		}
+	})
+
+	this.invalidName = ko.observable(false);
+
+	//To jest takie computed, ktore pozwala obsluzyc write'a i reada
+	normalny computer nie obsluguje write'a, sluzy tylko do zwracania
+}
+
+
+/////
+
+knockout validation
+
+ko.observable('').extend({ required: true });
+
+
