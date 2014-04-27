@@ -7,13 +7,20 @@
     padding-bottom: 20px;
 }
 
-.control-label {
+.form .control-label {
+    display: none;
+}
+.form .has-error .control-label {
+    display: inline-block;
     padding-left: 10px;
 }
 
-/* Nat */
 .tickets-typeadead {
 	list-style: none;
 	border: 1px solid black;
-	padding: 10px;
+    padding: 4px;
+}
+.tickets-typeadead a {
+    display: block;
+    padding: 4px;
 }

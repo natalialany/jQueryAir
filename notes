@@ -58,7 +58,7 @@ var AppViewMode - function() {
 	this.invalidName = ko.observable(false);
 
 	//To jest takie computed, ktore pozwala obsluzyc write'a i reada
-	normalny computer nie obsluguje write'a, sluzy tylko do zwracania
+	normalny computed nie obsluguje write'a, sluzy tylko do zwracania
 }
 
 

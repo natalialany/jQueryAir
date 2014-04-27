@@ -1,277 +1,172 @@
 (function () {
-    "use strict";
 
     /**************************
      SETTINGS
      *************************/
     var availableTickets = [
-        {city: 'Barcelona', cost: 120},
-        {city: 'Berlin', cost: 60},
-        {city: 'London', cost: 50},
-        {city: 'Oslo', cost: 100},
-        {city: 'Stockholm', cost: 150},
-        {city: 'Paris', cost: 100}
+        {city: 'Barcelona', cost: 120, focus: false},
+        {city: 'Berlin', cost: 60, focus: false},
+        {city: 'London', cost: 50, focus: false},
+        {city: 'Oslo', cost: 100, focus: false},
+        {city: 'Stockholm', cost: 150, focus: false},
+        {city: 'Paris', cost: 100, focus: false}
     ];
     var priorityCost = 15;
     var luggageCost = 20;
 
     /**************************
-     CACHED VARIABLES
+     FUNCTIONS
      *************************/
-    var $destination = $('#destination');
-    var $departureDate = $('#departureDate');
-    var $seat = $('#seat');
-    var $name = $('#passengerName');
-    var $surname = $('#passengerSurname');
-    var $email = $('#emailAddress');
-    var $additionalLuggage = $('#additionalLuggage');
-    var $priority = $('#priority');
-    var $termsAccepted = $('#terms');
-
-    /**************************
-     PLUGINS
-     *************************/
-    //Datepicker
-    $departureDate.datepicker();
-
-    //Autocomplete
-    $destination.typeahead({
-        source: function(query, callback) {
-            query = query.toLowerCase();
-
-            var result = availableTickets.filter(function(ticket) {
-                return (ticket.city.toLowerCase().indexOf(query) !== -1);
-            }).map(function(ticket){
-                return ticket.city;
-            });
-
-            callback(result);
-        }
-    });
-
-    //Choosing a seat in the plane
-    $seat.seatChooser();
-
-    /**************************
-    VALIDATORS
-    *************************/
-    $departureDate.on('changeDate', function() {
-        var date = $(this).data().datepicker.viewDate;
-
-        clearError(this);
-
-        //date in past
-        if(Date.now() > date.getTime()) {
-            setError(this, 'Chosen date is in the past')
-        }
-    }).on('change', function() {
-        $(this).data().datepicker.setValue($(this).val());
-    });
-
-    $destination.on('change', function() {
-        var city = $(this).val();
-
-        clearError(this);
-
-        if(!isValidDestination(city)) {
-            setError(this, 'Invalid destination');
-        }
-    });
-
-    function isValidDestination(city) {
-        return availableTickets.some(function(ticket) {
-            return ticket.city === city;
+    function isValidDestination(city, options) {
+        return options.some(function(ticket) {
+            return ticket.city.toLowerCase() === city.toLowerCase();
         });
     }
-
-    $email.on('change', function() {
-        var email = $(this).val();
-
-        clearError(this);
-
-        if(!isValidEmail(email)) {
-            setError(this, 'Invalid email');
-        }
-    });
-
     function isValidEmail(email) {
         return /^[a-z0-9._-]+\@[a-z0-9._-]+\.[a-z0-9._-]+$/gi.test(email);
     }
-
-    $seat.on('seatChanged', function() {
-        clearError(this);
-    }).on('change', function() {
-        var seatChooser = $(this).data('plugin_seatChooser');
-        var seatName = $(this).val();
-
-        clearError(this);
-
-        if(!seatChooser.setSeat(seatName)) {
-            setError(this, 'Invalid seat ID');
-        }
-    });
-
-    function isValidSeat(seat) {
-        var seatChooser = $seat.data('plugin_seatChooser');
-
-        return seatChooser.isValidSeat(seat);
-    }
-
-    $surname.on('change', function() {
-        clearError(this);
-
-        if($(this).val().length < 2) {
-            setError(this, 'Your surname is too short');
-        }
-    });
-
-    $name.on('change', function() {
-        clearError(this);
-
-        if($(this).val().length < 2) {
-            setError(this, 'Your name is too short');
-        }
-    });
-
-    $termsAccepted.on('change', function() {
-        clearError(this);
-
-        if(!$termsAccepted.is(':checked')) {
-            setError($termsAccepted.get(0), 'You have to accept terms and conditions');
-        }
-    })
-
-    $('form').on('submit', function() {
-        var valid = true;
-
-        if(!$termsAccepted.is(':checked')) {
-            setError($termsAccepted.get(0), 'You have to accept terms and conditions');
-            valid = false;
-        }
-
-        if($surname.val().length < 2) {
-            setError($surname.get(0), 'Your surname is too short');
-            valid = false;
-        }
-
-        if($name.val().length < 2) {
-            setError($name.get(0), 'Your name is too short');
-            valid = false;
-        }
-
-        if (!$seat.val()) {
-            setError($seat.get(0), 'Please chose a preferred seat.');
-            valid = false;
-        }
-
-        if (!isValidEmail($email.val())) {
-            setError($email.get(0), 'Invalid email');
-            valid = false;
-        }
-
-        if (!isValidDestination($destination.val())) {
-            setError($destination.get(0), 'Invalid destination');
-            valid = false;
-        }
-
-        if (!isValidSeat($seat.val())) {
-            setError($seat.get(0), 'Invalid seat ID');
-            valid = false;
-        }
-
-        if(Date.now() > $departureDate.data().datepicker.viewDate.getTime()) {
-            setError($departureDate.get(0), 'Chosen date is in the past');
-            valid = false;
-        }
-
-        if(valid) {
-            showSummaryDialog({
-                destination: $destination.val(),
-                departure: $departureDate.data().datepicker.viewDate,
-                name: $name.val() + ' ' + $surname.val(),
-                seat: $seat.val(),
-                email: $email.val(),
-                luggage: $additionalLuggage.val(),
-                priority: $priority.is(':checked')
-            });
-        }
-
-        return false;
-    });
-
-    /**************************
-     COST CALCULATION
-     *************************/
-    $('#destination, #additionalLuggage, #priority').on('change', function() {
-        var destination = $('#destination').val();
-        var additionalLuggage = $('#additionalLuggage').val();
-        var priority = $('#priority').is(':checked');
-
+    function getCostByCity(destination) {
         var ticket = availableTickets.filter(function(ticket){
             return (ticket.city === destination);
         });
-
-        if(!ticket.length) {
-            $('#totalCost').text('-');
-            return;
-        }
-
-        $('#totalCost').text(ticket[0].cost + (additionalLuggage * luggageCost) + (priority ? priorityCost : 0));
-    });
-
-    /**************************
-     SUMMARY DIALOG
-     *************************/
-    function showSummaryDialog(data) {
-        var $modal = $('#summaryModal');
-
-        $modal.find('.name').text(data.name);
-        $modal.find('.email').text(data.email);
-
-        $modal.find('.destination').text(data.destination);
-        $modal.find('.departure').text(data.departure);
-
-        $modal.find('.seat').text(data.seat);
-        $modal.find('.luggage_count').text(data.luggage);
-
-        if(data.luggage == 0) {
-            $modal.find('.luggage').hide();
-        } else {
-            $modal.find('.luggage').show();
-        }
-
-        if(data.priority) {
-            $modal.find('.priority').show();
-        } else {
-            $modal.find('.priority').hide();
-        }
-
-        $modal.modal();
+        return (ticket.length) ? ticket[0].cost : 0;
     }
 
-    /**************************
-     ERROR HANDLING
-     *************************/
-    function clearError(elem) {
-        var $formGroup = $(elem).closest('.form-group, .checkbox');
-        var $controlLabel = $formGroup.find('.control-label');
+    var AppViewModel = function() {
 
-        $formGroup.removeClass('has-error');
-        if($controlLabel) {
-            $controlLabel.text('').hide();
+        var self = this;
+        this.canValidate = ko.observable(false);
+
+        /**************************
+         INPUT VARIABLES
+         *************************/
+        var Input = function(condition, errorText, defaultValue) {
+            this.value = (typeof defaultValue !== "undefined") ? ko.observable(defaultValue) : ko.observable("");
+            this.text = errorText;
+
+            this.ifError = ko.computed(function() {
+                return !condition(this.value());
+            }, this);
+            this.errorClass = ko.computed(function() {
+                return (self.canValidate() && this.ifError()) ? "has-error" : "";
+            }, this);
+        };
+
+        this.passengerName = new Input(function(value) {
+            return value.length>=2;
+        }, "Your name is too short");
+
+        this.passengerSurname = new Input(function(value) {
+            return value.length>=2;
+        }, "Your surname is too short");
+
+        this.destination = new Input(function(value) {
+            return isValidDestination(value, availableTickets);
+        }, "Invalid destination");
+
+        this.emailAddress = new Input(function(value) {
+            return isValidEmail(value);
+        }, "Invalid email");
+
+        this.departureDate = new Input(function(value) {
+            return self.date && (Date.now() < self.date.getTime());
+        }, "Chosen date is in the past");
+
+        this.seatId = new Input(function(value) {
+            var seatChooser = $('#seat').data('plugin_seatChooser');
+            return seatChooser && seatChooser.isValidSeat(value);
+        }, "Invalid seat ID");
+
+        this.luggage = new Input(function(value) {
+            return true;
+        }, "", 0);
+
+        this.priority = new Input(function(value) {
+            return true;
+        }, "");
+
+        this.accept = new Input(function(value) {
+            return value;
+        }, "You have to accept terms and conditions");
+
+        /* Pushing all input variables into an array */
+        this.inputs = [
+            this.passengerName,
+            this.passengerSurname,
+            this.destination,
+            this.emailAddress,
+            this.departureDate,
+            this.seatId,
+            this.luggage,
+            this.priority,
+            this.accept
+        ];
+
+        /**************************
+         COMPUTED VARIABLES
+         *************************/
+        this.destinationsSuggested = ko.computed(function() {
+            return availableTickets.filter(ifSuchDestinationExist);
+        }, this);
+        this.totalCost = ko.computed(function() {
+            return (this.priority.value() ? priorityCost : 0) + (this.luggage.value() * luggageCost) + getCostByCity(this.destination.value());
+        }, this);
+
+        /**************************
+         CUSTOM BINDINGS
+         *************************/
+        ko.bindingHandlers.seatChoose = {
+            init: function(element) {
+                $(element).seatChooser();
+            },
+            update: function(element, valueAccessor) {
+                var value = valueAccessor();
+                var valueUnwrapped = ko.unwrap(value);
+                $(element).data('plugin_seatChooser').setSeat(valueUnwrapped);
+            }
+        };
+        ko.bindingHandlers.dateChoose = {
+            init: function(element) {
+                $(element).datepicker();
+            },
+            update: function(element, valueAccessor) {
+                var value = valueAccessor();
+                var valueUnwrapped = ko.unwrap(value);
+                self.date = $(element).data().datepicker.viewDate;
+            }
+        };
+
+        /**************************
+         HELPERS
+         *************************/
+        function ifSuchDestinationExist(ticket) {
+            if (self.destination.value()==="") {
+                return false;
+            } else {
+                var ticket = ticket.city.toLowerCase();
+                var destination = self.destination.value().toLowerCase();
+                return (ticket.indexOf(destination) >= 0 && destination.indexOf(ticket) < 0);
+            }
         }
-    }
 
-    function setError(elem, text) {
-        var $formGroup = $(elem).closest('.form-group, .checkbox');
-        var $controlLabel = $formGroup.find('.control-label');
+        /**************************
+         BINDED FUNCTIONS
+         *************************/
+        this.setDestination = function(ticket) {
+            self.destination.value(ticket.city);
+        };
+        this.submit = function() {
+            this.canValidate(true);
 
-        if(!$controlLabel.length) {
-            $controlLabel = $('<label>').addClass('control-label');
-            $formGroup.find('label').after($controlLabel);
-        }
+            var formErrors = this.inputs.filter(function(field){
+                return field.ifError();
+            });
+            if (formErrors.length===0) {
+                $('#summaryModal').modal();
+            }
+        };
+    };
 
-        $formGroup.addClass('has-error');
-        $controlLabel.text(text).show();
-    }
+    ko.applyBindings(new AppViewModel());
+
 })();
