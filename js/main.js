@@ -25,6 +25,11 @@
     function isValidEmail(email) {
         return /^[a-z0-9._-]+\@[a-z0-9._-]+\.[a-z0-9._-]+$/gi.test(email);
     }
+    function isValidDate(date) {
+        var numbers = date.split('-');
+        var date_picked = new Date(numbers[2], numbers[1]-1, numbers[0]);
+        return (date!="") && (date_picked > new Date());
+    }
     function getCostByCity(destination) {
         var ticket = availableTickets.filter(function(ticket){
             return (ticket.city === destination);
@@ -69,8 +74,8 @@
         }, "Invalid email");
 
         this.departureDate = new Input(function(value) {
-            return self.date && (Date.now() < self.date.getTime());
-        }, "Chosen date is in the past");
+            return isValidDate(value);
+        }, "Chosen date is in the past or not set");
 
         this.seatId = new Input(function(value) {
             var seatChooser = $('#seat').data('plugin_seatChooser');
@@ -118,21 +123,17 @@
         ko.bindingHandlers.seatChoose = {
             init: function(element) {
                 $(element).seatChooser();
-            },
-            update: function(element, valueAccessor) {
-                var value = valueAccessor();
-                var valueUnwrapped = ko.unwrap(value);
-                $(element).data('plugin_seatChooser').setSeat(valueUnwrapped);
+                $(element).on('seatChanged', function() {
+                    $(element).trigger('change');
+                });
             }
         };
         ko.bindingHandlers.dateChoose = {
             init: function(element) {
                 $(element).datepicker();
-            },
-            update: function(element, valueAccessor) {
-                var value = valueAccessor();
-                var valueUnwrapped = ko.unwrap(value);
-                self.date = $(element).data().datepicker.viewDate;
+                $(element).on('changeDate', function() {
+                    $(element).trigger('change');
+                });
             }
         };
 
