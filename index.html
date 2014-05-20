@@ -18,13 +18,7 @@
             <div class="form-group" data-bind="css: destination.errorClass">
                 <label for="destination">Destination</label>
                 <label class="control-label" data-bind="text: destination.text"></label>
-                <input id="destination" class="form-control" type="text" autocomplete="off" data-bind="value: destination.value, valueUpdate: 'afterkeydown', hasFocus: focus">
-
-                <ul class="tickets-typeadead" id='bookings' data-bind="foreach: destinationsSuggested, visible: destinationsSuggested().length>0">
-                    <li>
-                        <a href="#" data-bind="text: city, click: $parent.setDestination"></a>
-                    </li>
-                </ul>
+                <input id="destination" class="form-control" type="text" autocomplete="off" data-bind="value: destination.value, valueUpdate: 'afterkeydown', hasFocus: focus, custom_typeahead: value">
             </div>
 
             <div class="form-group" data-bind="css: departureDate.errorClass">
@@ -118,7 +112,7 @@
 <script src="vendor/jquery.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
 <script src="vendor/datepicker/js/bootstrap-datepicker.js"></script>
-<!-- <script src="vendor/typeahead/typeahead.js"></script> -->
+<script src="vendor/typeahead/typeahead.js"></script>
 <script src="vendor/seatChooser/seatChooser.js"></script>
 <!-- <script src="js/main.js"></script> -->
 

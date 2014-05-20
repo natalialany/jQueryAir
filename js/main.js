@@ -75,7 +75,7 @@
 
         this.departureDate = new Input(function(value) {
             return isValidDate(value);
-        }, "Chosen date is in the past or not set");
+        }, "Invalid date");
 
         this.seatId = new Input(function(value) {
             var seatChooser = $('#seat').data('plugin_seatChooser');
@@ -110,9 +110,6 @@
         /**************************
          COMPUTED VARIABLES
          *************************/
-        this.destinationsSuggested = ko.computed(function() {
-            return availableTickets.filter(ifSuchDestinationExist);
-        }, this);
         this.totalCost = ko.computed(function() {
             return (this.priority.value() ? priorityCost : 0) + (this.luggage.value() * luggageCost) + getCostByCity(this.destination.value());
         }, this);
@@ -133,9 +130,32 @@
                 $(element).datepicker();
                 $(element).on('changeDate', function() {
                     $(element).trigger('change');
+                    $(element).data().datepicker.hide();
                 });
+            },
+            update: function(element, valueAccessor) {
+                var value = valueAccessor();
+                var valueUnwrapped = ko.unwrap(value);
+                $(element).data().datepicker.hide();
             }
         };
+        ko.bindingHandlers.custom_typeahead  = {
+            init: function(element) {
+                $(element).typeahead({
+                    source: function(query, callback) {
+                        query = query.toLowerCase();
+
+                        var result = availableTickets.filter(function(ticket) {
+                            return (ticket.city.toLowerCase().indexOf(query) !== -1);
+                        }).map(function(ticket){
+                            return ticket.city;
+                        });
+
+                        callback(result);
+                    }
+                });
+            }
+        }
 
         /**************************
          HELPERS
