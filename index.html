@@ -9,114 +9,104 @@
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to jQueryAir</h1>
-        <p>You can book your ticket below</p>
+<div class="container">
+    <h1>Welcome to jQueryAir</h1>
+    <p>You can book your ticket below</p>
+
+    <hr/>
+    <form role="form" action="#">
+        <div class="form-group">
+            <label for="destination">Destination</label>
+            <input id="destination" class="form-control" type="text" autocomplete="off">
+        </div>
+
+        <div class="form-group">
+            <label for="departureDate">Departure</label>
+            <input id="departureDate" class="form-control" type="text" placeholder="dd-mm-yyyy" data-date-format="dd-mm-yyyy">
+        </div>
 
         <hr/>
-        <form role="form" action="#" class="form">
-            <div class="form-group" data-bind="css: destination.errorClass">
-                <label for="destination">Destination</label>
-                <label class="control-label" data-bind="text: destination.text"></label>
-                <input id="destination" class="form-control" type="text" autocomplete="off" data-bind="value: destination.value, valueUpdate: 'afterkeydown', hasFocus: focus, custom_typeahead: value">
+
+        <div class="form-group" data-bind="validationElement: form.name">
+            <label for="passengerName">Passenger name</label>
+            <input type="text" class="form-control" id="passengerName" data-bind="value: form.name">
+        </div>
+
+        <div class="form-group" data-bind="validationElement: form.surname">
+            <label for="passengerSurname">Passenger surname</label>
+            <input type="text" class="form-control" id="passengerSurname" data-bind="value: form.surname">
+        </div>
+
+        <div class="form-group" data-bind="validationElement: form.email">
+            <label for="emailAddress">Email address</label>
+            <input type="email" class="form-control" id="emailAddress" placeholder="Enter email" data-bind="value: form.email">
+        </div>
+
+        <hr/>
+
+        <div class="form-group">
+            <label for="seat">Preferred seat</label>
+            <input type="text" class="form-control" id="seat">
+        </div>
+
+        <div class="form-group">
+            <label for="additionalLuggage">Additional luggage</label>
+            <input type="number" class="form-control" id="additionalLuggage" min="0" max="5" value="0">
+        </div>
+
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="priority"> Priority boarding
+            </label>
+        </div>
+
+        <hr/>
+
+        <div class="alert alert-info"><strong>Total cost:</strong> <span id="totalCost">-</span>&#8364</div>
+
+        <hr/>
+
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="terms"> I accept terms and conditions
+            </label>
+        </div>
+        <button type="submit" class="btn btn-primary" data-bind="click: submit">Book ticket</button>
+    </form>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="summaryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
             </div>
+            <div class="modal-body">
+                Your name is <strong class="name"></strong> and your email is <strong class="email"></strong>.
 
-            <div class="form-group" data-bind="css: departureDate.errorClass">
-                <label for="departureDate">Departure</label>
-                <label class="control-label" data-bind="text: departureDate.text"></label>
-                <input id="departureDate" class="form-control" type="text" placeholder="dd-mm-yyyy" data-date-format="dd-mm-yyyy" data-bind="value: departureDate.value, valueUpdate: 'input', dateChoose: departureDate.value">
+                You are booking a flight to <strong class="destination"></strong> on <strong class="departure"></strong>.
+
+                Your preferred seat is <strong class="seat"></strong><span class="luggage"> and you are taking <strong class="luggage_count"></strong> bags with you</span>.
+
+                <span class="priority">You have bought <strong>priority boarding</strong>.</span>
             </div>
-
-            <hr/>
-
-            <div class="form-group" data-bind="css: passengerName.errorClass">
-                <label for="passengerName">Passenger name</label>
-                <label class="control-label" data-bind="text: passengerName.text"></label>
-                <input type="text" class="form-control" id="passengerName" data-bind="value: passengerName.value, flash: passengerName.value, valueUpdate: 'afterkeydown'">
-            </div>
-
-            <div class="form-group" data-bind="css: passengerSurname.errorClass">
-                <label for="passengerSurname">Passenger surname</label>
-                <label class="control-label" data-bind="text: passengerSurname.text"></label>
-                <input type="text" class="form-control" id="passengerSurname" data-bind="value: passengerSurname.value, valueUpdate: 'afterkeydown'">
-            </div>
-
-            <div class="form-group" data-bind="css: emailAddress.errorClass">
-                <label for="emailAddress">Email address</label>
-                <label class="control-label" data-bind="text: emailAddress.text"></label>
-                <input type="email" class="form-control" id="emailAddress" placeholder="Enter email" data-bind="value: emailAddress.value, valueUpdate: 'afterkeydown'">
-            </div>
-
-            <hr/>
-
-            <div class="form-group" data-bind="css: seatId.errorClass">
-                <label for="seat">Preferred seat</label>
-                <label class="control-label" data-bind="text: seatId.text"></label>
-                <input type="text" class="form-control" id="seat" data-bind="value: seatId.value, seatChoose: seatId.value, valueUpdate: 'afterkeydown'">
-            </div>
-
-            <div class="form-group" data-bind="css: luggage.errorClass">
-                <label for="additionalLuggage">Additional luggage</label>
-                <label class="control-label" data-bind="text: luggage.text"></label>
-                <input type="number" class="form-control" id="additionalLuggage" min="0" max="5" value="0" data-bind="value: luggage.value, valueUpdate: 'afterkeydown'">
-            </div>
-
-            <div class="checkbox"  data-bind="css: priority.errorClass">
-                <label>
-                    <input type="checkbox" id="priority"  data-bind="checked: priority.value, valueUpdate: 'afterkeydown'"> Priority boarding
-                    <label class="control-label" data-bind="text: priority.text"></label>
-                </label>
-            </div>
-
-            <hr/>
-
-            <div class="alert alert-info"><strong>Total cost:</strong> <span id="totalCost" data-bind="text: totalCost">-</span>&#8364</div>
-
-            <hr/>
-
-            <div class="checkbox"  data-bind="css: accept.errorClass">
-                <label>
-                    <input type="checkbox" id="terms"  data-bind="checked: accept.value, valueUpdate: 'afterkeydown'"> I accept terms and conditions
-                    <label class="control-label" data-bind="text: accept.text"></label>
-                </label>
-            </div>
-            <button type="submit" class="btn btn-primary" data-bind="click: submit">Book ticket</button>
-        </form>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="summaryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">Modal title</h4>
-                </div>
-                <div class="modal-body">
-                    Your name is <strong class="name" data-bind="text: passengerName.value"></strong>
-                    and your email is <strong class="email" data-bind="text: emailAddress.value"></strong>.
-                    You are booking a flight to <strong class="destination" data-bind="text: destination.value"></strong>
-                    on <strong class="departure" data-bind="text: departureDate.value"></strong>.
-                    Your preferred seat is <strong class="seat" data-bind="text: seatId.value"></strong>
-                    <span class="luggage" data-bind="visible: luggage.value()>0">and you are taking <strong class="luggage_count" data-bind="text: luggage.value"></strong> bags with you</span>.
-                    <span class="priority" data-bind="visible: priority.value()">You have bought <strong>priority boarding</strong>.</span>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
             </div>
         </div>
     </div>
+</div>
 
 <script src="vendor/jquery.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
 <script src="vendor/datepicker/js/bootstrap-datepicker.js"></script>
 <script src="vendor/typeahead/typeahead.js"></script>
 <script src="vendor/seatChooser/seatChooser.js"></script>
-<!-- <script src="js/main.js"></script> -->
-
-<script type='text/javascript' src='js/knockout-3.1.0.js'></script>
+<script src="js/knockout-3.1.0.js"></script>
+<script src="vendor/Knockout-Validation/knockout.validation.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

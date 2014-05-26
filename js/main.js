@@ -37,155 +37,31 @@
         return (ticket.length) ? ticket[0].cost : 0;
     }
 
+    ko.validation.init( {
+        errorElementClass: 'has-error',
+        errorMessageClass: 'has-error control-label',
+        decorateInputElement: true
+    } );
+
     var AppViewModel = function() {
 
         var self = this;
-        this.canValidate = ko.observable(false);
 
-        /**************************
-         INPUT VARIABLES
-         *************************/
-        var Input = function(condition, errorText, defaultValue) {
-            this.value = (typeof defaultValue !== "undefined") ? ko.observable(defaultValue) : ko.observable("");
-            this.text = errorText;
-
-            this.ifError = ko.computed(function() {
-                return !condition(this.value());
-            }, this);
-            this.errorClass = ko.computed(function() {
-                return (self.canValidate() && this.ifError()) ? "has-error" : "";
-            }, this);
-        };
-
-        this.passengerName = new Input(function(value) {
-            return value.length>=2;
-        }, "Your name is too short");
-
-        this.passengerSurname = new Input(function(value) {
-            return value.length>=2;
-        }, "Your surname is too short");
-
-        this.destination = new Input(function(value) {
-            return isValidDestination(value, availableTickets);
-        }, "Invalid destination");
-
-        this.emailAddress = new Input(function(value) {
-            return isValidEmail(value);
-        }, "Invalid email");
-
-        this.departureDate = new Input(function(value) {
-            return isValidDate(value);
-        }, "Invalid date");
-
-        this.seatId = new Input(function(value) {
-            var seatChooser = $('#seat').data('plugin_seatChooser');
-            return seatChooser && seatChooser.isValidSeat(value);
-        }, "Invalid seat ID");
-
-        this.luggage = new Input(function(value) {
-            return true;
-        }, "", 0);
-
-        this.priority = new Input(function(value) {
-            return true;
-        }, "");
-
-        this.accept = new Input(function(value) {
-            return value;
-        }, "You have to accept terms and conditions");
-
-        /* Pushing all input variables into an array */
-        this.inputs = [
-            this.passengerName,
-            this.passengerSurname,
-            this.destination,
-            this.emailAddress,
-            this.departureDate,
-            this.seatId,
-            this.luggage,
-            this.priority,
-            this.accept
-        ];
-
-        /**************************
-         COMPUTED VARIABLES
-         *************************/
-        this.totalCost = ko.computed(function() {
-            return (this.priority.value() ? priorityCost : 0) + (this.luggage.value() * luggageCost) + getCostByCity(this.destination.value());
-        }, this);
-
-        /**************************
-         CUSTOM BINDINGS
-         *************************/
-        ko.bindingHandlers.seatChoose = {
-            init: function(element) {
-                $(element).seatChooser();
-                $(element).on('seatChanged', function() {
-                    $(element).trigger('change');
-                });
-            }
-        };
-        ko.bindingHandlers.dateChoose = {
-            init: function(element) {
-                $(element).datepicker();
-                $(element).on('changeDate', function() {
-                    $(element).trigger('change');
-                    $(element).data().datepicker.hide();
-                });
-            },
-            update: function(element, valueAccessor) {
-                var value = valueAccessor();
-                var valueUnwrapped = ko.unwrap(value);
-                $(element).data().datepicker.hide();
-            }
-        };
-        ko.bindingHandlers.custom_typeahead  = {
-            init: function(element) {
-                $(element).typeahead({
-                    source: function(query, callback) {
-                        query = query.toLowerCase();
-
-                        var result = availableTickets.filter(function(ticket) {
-                            return (ticket.city.toLowerCase().indexOf(query) !== -1);
-                        }).map(function(ticket){
-                            return ticket.city;
-                        });
-
-                        callback(result);
-                    }
-                });
-            }
+        this.form = {
+            name : ko.observable().extend({ required: true, minLength: 3  }),
+            surname : ko.observable().extend({ required: true, minLength: 3  }),
+            email : ko.observable().extend({ required: true, minLength: 3  })
         }
 
-        /**************************
-         HELPERS
-         *************************/
-        function ifSuchDestinationExist(ticket) {
-            if (self.destination.value()==="") {
-                return false;
+        this.submit =  function () {
+            var errors = ko.validation.group(self.form, { deep: true });
+            if (errors().length==0) {
+                console.log('Thank you.');
             } else {
-                var ticket = ticket.city.toLowerCase();
-                var destination = self.destination.value().toLowerCase();
-                return (ticket.indexOf(destination) >= 0 && destination.indexOf(ticket) < 0);
+                console.log('Please check your submission.');
+                errors.showAllMessages();
             }
         }
-
-        /**************************
-         BINDED FUNCTIONS
-         *************************/
-        this.setDestination = function(ticket) {
-            self.destination.value(ticket.city);
-        };
-        this.submit = function() {
-            this.canValidate(true);
-
-            var formErrors = this.inputs.filter(function(field){
-                return field.ifError();
-            });
-            if (formErrors.length===0) {
-                $('#summaryModal').modal();
-            }
-        };
     };
 
     ko.applyBindings(new AppViewModel());
