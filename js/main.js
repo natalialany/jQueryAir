@@ -22,9 +22,6 @@
             return ticket.city.toLowerCase() === city.toLowerCase();
         });
     }
-    function isValidEmail(email) {
-        return /^[a-z0-9._-]+\@[a-z0-9._-]+\.[a-z0-9._-]+$/gi.test(email);
-    }
     function isValidDate(date) {
         var numbers = date.split('-');
         var date_picked = new Date(numbers[2], numbers[1]-1, numbers[0]);
@@ -37,21 +34,85 @@
         return (ticket.length) ? ticket[0].cost : 0;
     }
 
+    /**************************
+     CUSTOM BINDINGS
+     *************************/
+    ko.bindingHandlers.seatChoose = {
+        init: function(element) {
+            $(element).seatChooser();
+            $(element).on('seatChanged', function() {
+                $(element).trigger('change');
+            });
+        }
+    };
+    ko.bindingHandlers.dateChoose = {
+        init: function(element) {
+            $(element).datepicker();
+            $(element).on('changeDate', function() {
+                $(element).trigger('change');
+                $(element).data().datepicker.hide();
+            });
+        },
+        update: function(element, valueAccessor) {
+            var value = valueAccessor();
+            var valueUnwrapped = ko.unwrap(value);
+            $(element).data().datepicker.hide();
+        }
+    };
+    ko.bindingHandlers.custom_typeahead  = {
+        init: function(element) {
+            $(element).typeahead({
+                source: function(query, callback) {
+                    query = query.toLowerCase();
+
+                    var result = availableTickets.filter(function(ticket) {
+                        return (ticket.city.toLowerCase().indexOf(query) !== -1);
+                    }).map(function(ticket){
+                            return ticket.city;
+                        });
+
+                    callback(result);
+                }
+            });
+        }
+    }
+
+    /**************************
+     Knockout Validation plugin
+     *************************/
     ko.validation.init( {
         errorElementClass: 'has-error',
-        errorMessageClass: 'has-error control-label',
+        errorMessageClass: 'control-label',
         decorateInputElement: true
     } );
+
+    ko.validation.rules['validateDestination'] = {
+        validator: function (city, options) {
+            console.log('validation');
+            return (city===undefined) || options.some(function(ticket) {
+                return ticket.city.toLowerCase() === city.toLowerCase();
+            });
+        },
+        message: 'Invalid destination'
+    };
+    ko.validation.registerExtenders();
 
     var AppViewModel = function() {
 
         var self = this;
 
         this.form = {
-            name : ko.observable().extend({ required: true, minLength: 3  }),
-            surname : ko.observable().extend({ required: true, minLength: 3  }),
-            email : ko.observable().extend({ required: true, minLength: 3  })
+            name : ko.observable().extend({ required: true, minLength: 2  }),
+            surname : ko.observable().extend({ required: true, minLength: 2  }),
+            email : ko.observable().extend({ required: true, email: true }),
+            accept : ko.observable().extend({ equal: { params: true, message:'You have to accept terms and conditions' }}),
+            destination : ko.observable().extend({ required: true, validateDestination: availableTickets, message:'Invalid destination' })
         }
+        this.luggage = ko.observable(0);
+        this.priority = ko.observable(false);
+        this.totalCost = ko.computed(function() {
+            return (this.priority() ? priorityCost : 0) + (this.luggage() * luggageCost); // + getCostByCity(this.destination.value());
+        }, this);
 
         this.submit =  function () {
             var errors = ko.validation.group(self.form, { deep: true });

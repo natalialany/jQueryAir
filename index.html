@@ -15,17 +15,15 @@
 
     <hr/>
     <form role="form" action="#">
-        <div class="form-group">
+        <div class="form-group" data-bind="validationElement: form.destination">
             <label for="destination">Destination</label>
-            <input id="destination" class="form-control" type="text" autocomplete="off">
+            <input id="destination" class="form-control" type="text" autocomplete="off" data-bind="value: form.destination, custom_typeahead: value">
         </div>
 
         <div class="form-group">
             <label for="departureDate">Departure</label>
             <input id="departureDate" class="form-control" type="text" placeholder="dd-mm-yyyy" data-date-format="dd-mm-yyyy">
         </div>
-
-        <hr/>
 
         <div class="form-group" data-bind="validationElement: form.name">
             <label for="passengerName">Passenger name</label>
@@ -51,25 +49,24 @@
 
         <div class="form-group">
             <label for="additionalLuggage">Additional luggage</label>
-            <input type="number" class="form-control" id="additionalLuggage" min="0" max="5" value="0">
+            <input type="number" class="form-control" id="additionalLuggage" min="0" max="5" value="0" data-bind="value: luggage">
         </div>
 
         <div class="checkbox">
-            <label>
-                <input type="checkbox" id="priority"> Priority boarding
-            </label>
+            <input type="checkbox" id="priority" data-bind="checked: priority">
+            <label for="priority">Priority boarding</label>
         </div>
 
         <hr/>
 
-        <div class="alert alert-info"><strong>Total cost:</strong> <span id="totalCost">-</span>&#8364</div>
+        <div class="alert alert-info"><strong>Total cost:</strong> <span id="totalCost" data-bind="text: totalCost">-</span>&#8364</div>
 
         <hr/>
 
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" id="terms"> I accept terms and conditions
-            </label>
+        <div class="checkbox" data-bind="validationElement: form.accept">
+            <input type="checkbox" id="terms" data-bind="checked: form.accept">
+            <label for="terms"> I accept terms and conditions</label>
+            <span data-bind="validationMessage: form.accept" class="has-error control-label"></span>
         </div>
         <button type="submit" class="btn btn-primary" data-bind="click: submit">Book ticket</button>
     </form>
