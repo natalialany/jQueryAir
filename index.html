@@ -20,9 +20,9 @@
             <input id="destination" class="form-control" type="text" autocomplete="off" data-bind="value: form.destination, custom_typeahead: value">
         </div>
 
-        <div class="form-group">
+        <div class="form-group" data-bind="validationElement: form.date">
             <label for="departureDate">Departure</label>
-            <input id="departureDate" class="form-control" type="text" placeholder="dd-mm-yyyy" data-date-format="dd-mm-yyyy">
+            <input id="departureDate" class="form-control" type="text" placeholder="dd-mm-yyyy" data-date-format="dd-mm-yyyy" data-bind="value: form.date, custom_date: value">
         </div>
 
         <div class="form-group" data-bind="validationElement: form.name">
@@ -42,9 +42,9 @@
 
         <hr/>
 
-        <div class="form-group">
+        <div class="form-group" data-bind="validationElement: form.seat">
             <label for="seat">Preferred seat</label>
-            <input type="text" class="form-control" id="seat">
+            <input type="text" class="form-control" id="seat" data-bind="value: form.seat, custom_seat: value">
         </div>
 
         <div class="form-group">

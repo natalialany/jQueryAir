@@ -17,16 +17,6 @@
     /**************************
      FUNCTIONS
      *************************/
-    function isValidDestination(city, options) {
-        return options.some(function(ticket) {
-            return ticket.city.toLowerCase() === city.toLowerCase();
-        });
-    }
-    function isValidDate(date) {
-        var numbers = date.split('-');
-        var date_picked = new Date(numbers[2], numbers[1]-1, numbers[0]);
-        return (date!="") && (date_picked > new Date());
-    }
     function getCostByCity(destination) {
         var ticket = availableTickets.filter(function(ticket){
             return (ticket.city === destination);
@@ -37,26 +27,22 @@
     /**************************
      CUSTOM BINDINGS
      *************************/
-    ko.bindingHandlers.seatChoose = {
+    ko.bindingHandlers.custom_seat = {
         init: function(element) {
             $(element).seatChooser();
             $(element).on('seatChanged', function() {
+                console.log('aaaaa');
                 $(element).trigger('change');
             });
         }
     };
-    ko.bindingHandlers.dateChoose = {
+    ko.bindingHandlers.custom_date = {
         init: function(element) {
             $(element).datepicker();
             $(element).on('changeDate', function() {
                 $(element).trigger('change');
                 $(element).data().datepicker.hide();
             });
-        },
-        update: function(element, valueAccessor) {
-            var value = valueAccessor();
-            var valueUnwrapped = ko.unwrap(value);
-            $(element).data().datepicker.hide();
         }
     };
     ko.bindingHandlers.custom_typeahead  = {
@@ -80,20 +66,30 @@
     /**************************
      Knockout Validation plugin
      *************************/
+    /* Setup */
     ko.validation.init( {
         errorElementClass: 'has-error',
         errorMessageClass: 'control-label',
         decorateInputElement: true
     } );
-
-    ko.validation.rules['validateDestination'] = {
+    /* Custom rules */
+    ko.validation.rules['custom_validateDestination'] = {
         validator: function (city, options) {
-            console.log('validation');
+            console.log('custom_validateDestination');
             return (city===undefined) || options.some(function(ticket) {
                 return ticket.city.toLowerCase() === city.toLowerCase();
             });
         },
         message: 'Invalid destination'
+    };
+    ko.validation.rules['custom_validateDate'] = {
+        validator: function(date) {
+            console.log('custom_validateDate');
+            var numbers = date.split('-');
+            var date_picked = new Date(numbers[2], numbers[1]-1, numbers[0]);
+            return (date!="") && (date_picked > new Date());
+        },
+        message: 'Invalid date'
     };
     ko.validation.registerExtenders();
 
@@ -106,7 +102,9 @@
             surname : ko.observable().extend({ required: true, minLength: 2  }),
             email : ko.observable().extend({ required: true, email: true }),
             accept : ko.observable().extend({ equal: { params: true, message:'You have to accept terms and conditions' }}),
-            destination : ko.observable().extend({ required: true, validateDestination: availableTickets, message:'Invalid destination' })
+            destination : ko.observable().extend({ required: true, custom_validateDestination: availableTickets }),
+            date: ko.observable().extend({ required: true, custom_validateDate: 0 }),
+            seat: ko.observable().extend({ required: true })
         }
         this.luggage = ko.observable(0);
         this.priority = ko.observable(false);
