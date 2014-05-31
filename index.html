@@ -81,13 +81,11 @@
                 <h4 class="modal-title" id="myModalLabel">Modal title</h4>
             </div>
             <div class="modal-body">
-                Your name is <strong class="name"></strong> and your email is <strong class="email"></strong>.
-
-                You are booking a flight to <strong class="destination"></strong> on <strong class="departure"></strong>.
-
-                Your preferred seat is <strong class="seat"></strong><span class="luggage"> and you are taking <strong class="luggage_count"></strong> bags with you</span>.
-
-                <span class="priority">You have bought <strong>priority boarding</strong>.</span>
+                Your name is <strong class="name" data-bind="text: fullName"></strong> and your email is <strong class="email" data-bind="text: form.email"></strong>.
+                You are booking a flight to <strong class="destination" data-bind="text: form.destination"></strong> on <strong class="departure" data-bind="text: form.date"></strong>.
+                Your preferred seat is <strong class="seat" data-bind="text: form.seat"></strong>
+                <span class="luggage">and you are taking <strong class="luggage_count" data-bind="text: form.luggage"></strong> bags with you</span>.
+                <span class="priority" data-bind="visible: form.priority()">You have bought <strong>priority boarding</strong>.</span>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
