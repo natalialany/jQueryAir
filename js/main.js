@@ -28,12 +28,17 @@
      CUSTOM BINDINGS
      *************************/
     ko.bindingHandlers.custom_seat = {
-        init: function(element) {
+        init : function(element) {
             $(element).seatChooser();
             $(element).on('seatChanged', function() {
-                console.log('aaaaa');
-                $(element).trigger('change');
+                var val = $(element).val();
+                $(this).attr('value', val).trigger('change');
             });
+        },
+        update : function(element, valueAccessor, allBindingsAccessor) {
+            var value = valueAccessor();
+            var valueUnwrapped = ko.unwrap(value);
+            $(element).data('plugin_seatChooser').setSeat(valueUnwrapped);
         }
     };
     ko.bindingHandlers.custom_date = {
@@ -72,7 +77,6 @@
         errorMessageClass: 'control-label',
         decorateInputElement: true
     } );
-    /* Custom rules */
     ko.validation.rules['custom_validateDestination'] = {
         validator: function (city, options) {
             console.log('custom_validateDestination');
@@ -89,7 +93,7 @@
             var date_picked = new Date(numbers[2], numbers[1]-1, numbers[0]);
             return (date!="") && (date_picked > new Date());
         },
-        message: 'Invalid date'
+        message: 'Chosen date is in the past'
     };
     ko.validation.registerExtenders();
 
@@ -98,21 +102,21 @@
         var self = this;
 
         this.form = {
-            name : ko.observable().extend({ required: true, minLength: 2  }),
-            surname : ko.observable().extend({ required: true, minLength: 2  }),
-            email : ko.observable().extend({ required: true, email: true }),
-            accept : ko.observable().extend({ equal: { params: true, message:'You have to accept terms and conditions' }}),
-            destination : ko.observable().extend({ required: true, custom_validateDestination: availableTickets }),
-            date: ko.observable().extend({ required: true, custom_validateDate: 0 }),
-            seat: ko.observable().extend({ required: true })
+            name: ko.observable().extend({ required: true, minLength: 2  }),
+            surname: ko.observable().extend({ required: true, minLength: 2  }),
+            email: ko.observable().extend({ required: true, email: true }),
+            accept: ko.observable().extend({ equal: { params: true, message:'You have to accept terms and conditions' }}),
+            destination: ko.observable().extend({ required: true, custom_validateDestination: availableTickets }),
+            date: ko.observable().extend({ required: true, pattern : { params : /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/, message : 'Invalid date format' }, custom_validateDate: null }),
+            seat: ko.observable('').extend({ required: true, pattern: { params: /^(0?[1-9]|1[0-9]|2[0-5])[A-F]$/, message: 'Invalid seat format' } } ),
+            luggage: ko.observable(0),
+            priority: ko.observable(false)
         }
-        this.luggage = ko.observable(0);
-        this.priority = ko.observable(false);
         this.totalCost = ko.computed(function() {
-            return (this.priority() ? priorityCost : 0) + (this.luggage() * luggageCost); // + getCostByCity(this.destination.value());
+            return (this.form.priority() ? priorityCost : 0) + (this.form.luggage() * luggageCost) + getCostByCity(this.form.destination());
         }, this);
 
-        this.submit =  function () {
+        this.submit = function () {
             var errors = ko.validation.group(self.form, { deep: true });
             if (errors().length==0) {
                 console.log('Thank you.');

@@ -44,16 +44,16 @@
 
         <div class="form-group" data-bind="validationElement: form.seat">
             <label for="seat">Preferred seat</label>
-            <input type="text" class="form-control" id="seat" data-bind="value: form.seat, custom_seat: value">
+            <input type="text" class="form-control" id="seat" data-bind="value: form.seat, custom_seat: form.seat">
         </div>
 
         <div class="form-group">
             <label for="additionalLuggage">Additional luggage</label>
-            <input type="number" class="form-control" id="additionalLuggage" min="0" max="5" value="0" data-bind="value: luggage">
+            <input type="number" class="form-control" id="additionalLuggage" min="0" max="5" value="0" data-bind="value: form.luggage">
         </div>
 
         <div class="checkbox">
-            <input type="checkbox" id="priority" data-bind="checked: priority">
+            <input type="checkbox" id="priority" data-bind="checked: form.priority">
             <label for="priority">Priority boarding</label>
         </div>
 
@@ -99,7 +99,7 @@
 
 <script src="vendor/jquery.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
-<script src="vendor/datepicker/js/bootstrap-datepicker.js"></script>
+    <script src="vendor/datepicker/js/bootstrap-datepicker.js"></script>
 <script src="vendor/typeahead/typeahead.js"></script>
 <script src="vendor/seatChooser/seatChooser.js"></script>
 <script src="js/knockout-3.1.0.js"></script>
